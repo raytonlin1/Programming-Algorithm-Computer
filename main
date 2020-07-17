@@ -1,0 +1,201 @@
+def bsearch():
+    print("The Binary Search algorithm will be used to determine the number you chose from 1 to 10.")
+    num=int(input("Enter a number from 1-10: "))
+    while num<1 or num>10:
+        num=int(input("Invalid! Enter a number from 1-10: "))
+    left=1
+    right=10
+    mid=(left+right)//2
+    if mid==num:
+        print("Your number is "+str(mid)+", which is the same as the current middle number.")
+    while mid!=num:
+        if mid>num:
+            print("The middle number",str(mid),"is higher than your number.")
+            right=mid-1
+            mid=(left+right)//2
+        elif mid<num:
+            print("The middle number",str(mid),"is lower than your number.")
+            left=mid+1
+            mid=(left+right)//2
+    print("Your number is "+str(mid)+", which is the same as the current middle number.")
+            
+
+def bfs():
+    print("The Breadth First Search algorithm will be used to solve the Choose Your Own Path problem. https://dmoj.ca/problem/ccc18j5")
+    pages=int(input("Enter the number of pages: "))
+    roads=[[] for i in range(pages+1)]
+    endpages=[]
+    for i in range(1,pages+1):
+        print("Enter the page options from the current page, separated by spaces in one line.")
+        pathsofpage=list(map(int,input().split(" ")))
+        for j in range(pathsofpage[0]):
+            roads[i].append(pathsofpage[j+1])
+        if pathsofpage[0]==0:
+            endpages.append(i)
+    queue=[1]
+    visited=[False for i in range(pages)]
+    shortestpath=[10001 for i in range(pages)]
+    shortestpath[0]=0
+    visited[0]=True
+    currentshortestpath=1
+    nodestillnextpath=[1]
+    while len(queue)>0:
+        currentnode=queue.pop(0)
+        nodestillnextpath[currentshortestpath-1]-=1
+        for i in roads[currentnode]:
+            if visited[i-1]==False:
+                visited[i-1]=True
+                shortestpath[i-1]=min(shortestpath[i-1],currentshortestpath)
+                queue.append(i)
+                if len(nodestillnextpath)<currentshortestpath+1:
+                    nodestillnextpath.append(0)
+                nodestillnextpath[-1]+=1
+        if nodestillnextpath[currentshortestpath-1]==0:
+            currentshortestpath+=1
+                    
+
+        
+    if False in visited:
+        print("N")
+    else:
+        print("Y")
+    finalshortestpath=10001
+    for i in endpages:
+        if shortestpath[i-1]<finalshortestpath:
+            finalshortestpath=shortestpath[i-1]
+    print(finalshortestpath+1)
+
+def dfs():
+    print("The Depth First Search algorithm will be used to solve the A Noisy Class problem. https://dmoj.ca/problem/anoisyclass")
+    from sys import exit
+    students = int(input("Enter the number of students: "))
+    connections = int(input("Enter the number of connections: "))
+    classlist = []
+    current_node = []
+    node = 0
+    visited = []
+    for x in range(students):
+        classlist.append([])
+    for x in range(connections):
+        s1, s2 = input("Enter the noisy student and the distacted student in order in one line, separated by a space: ").split()
+        s1, s2 = int(s1), int(s2)
+        classlist[s1-1].append(s2)
+    def dfs(node, adj):
+        global visited
+        if node in visited:
+            visited = []
+            return True
+        visited.append(node)
+        x = 0
+        for child in classlist[node-1]:
+            try:
+                return dfs(child, classlist[child-1][x])
+            except IndexError:
+                continue
+            x = x+1
+        visited = []
+        return False
+    for x in range(len(classlist)):
+        for y in range(len(classlist[x])):
+            if (dfs(x+1, classlist[x][y]))==True:
+                print ("N")
+                exit()
+    print ("Y")
+
+
+def dijkstra():
+    import heapq
+    print("Dijkstra's Algorithm will be used to solve the Single Source Shortest Path problem. https://dmoj.ca/problem/sssp")
+    print("Enter the number of vertices and edges in one line, separated by a space.")
+    vertices,edges=map(int,input().split(" "))
+    roads=[[] for i in range(vertices+1)]
+    adj=[[] for i in range(vertices+1)]
+    distances=[10000000 for i in range(vertices+1)]
+
+
+    q=[i for i in range(1,vertices)]
+
+    for i in range(edges):
+        print("Enter the next road's starting vertex, ending vertex and weight in one line, separated by a space.")
+        start,end,weight=map(int,input().split(" "))
+        if end in adj[start]:
+            edgeweight=roads[start][adj[start].index(end)]
+            if weight<edgeweight[1]:
+                roads[start][adj[start].index(end)]=(end,weight)
+                roads[end][adj[end].index(start)]=(start,weight)
+
+                
+            continue
+        roads[start].append((end,weight))
+        roads[end].append((start,weight))
+        adj[start].append(end)
+        adj[end].append(start)
+    distances[1]=0
+    hq=[(distances[i],i) for i in range(len(distances))]
+    heapq.heapify(hq)
+    #Djikstra Algorithm
+    while len(q)>0:
+        currentnode=heapq.heappop(hq)[1]
+        try:
+            del q[q.index(currentnode)]
+        except:
+            pass
+        for i in range(len(roads[currentnode])):
+            nnode=roads[currentnode][i][0]
+            nweight=roads[currentnode][i][1]
+            if distances[currentnode]+nweight<distances[nnode]:
+                distances[nnode]=distances[currentnode]+nweight
+                heapq.heappush(hq,(distances[nnode],nnode))
+                
+    for i in range(1,vertices+1):
+        if distances[i]==10000000:
+            print(-1)
+            continue
+        print(distances[i])
+
+def dp():
+    print("Dynamic Programming will be used to solve the Golf problem. https://dmoj.ca/problem/ccc00s4")
+    coins = []
+    sumans = int(input("Enter the distance from the tee to the hole: "))
+    numofcoins=int(input("Enter the number of clubs: "))
+    for i in range(numofcoins):
+        coins.append(int(input("Enter the distance that the current club will hit the ball: ")))
+    bestcoins = []
+    for i in range(sumans + 1):
+        coinstouse = []
+        lowestcoins = sumans + 1
+        for j in coins:
+            if j <= i:
+                coinstouse.append(j)
+        if len(coinstouse) > 0:
+            for j in coinstouse:
+                if bestcoins[i - j] < lowestcoins and (i==j or bestcoins[i - j]!=0):
+                    lowestcoins = bestcoins[i - j] + 1
+            if lowestcoins!=sumans+1:
+                bestcoins.append(lowestcoins)
+            else:
+                bestcoins.append(0)
+        else:
+            bestcoins.append(0)
+    if bestcoins[sumans]!=0:
+        print ("Roberta wins in {} strokes.".format(bestcoins[sumans]))
+    else:
+        print("Roberta acknowledges defeat.")
+    
+
+
+print("This is the Programming Algorithm Computer. You can use this program to create an example output using an algorithm.")
+inputt=input("Enter 1 for Binary Search, 2 for Breadth First Search, 3 for Depth First Search, 4 for Dijkstra's Algorithm or 5 for Dynamic Programming: ")
+if inputt=="1":
+    bsearch()
+elif inputt=="2":
+    bfs()
+elif inputt=="3":
+    dfs()
+elif inputt=="4":
+    dijkstra()
+elif inputt=="5":
+    dp()
+else:
+    print("Invalid input, this program will now terminate.")
+
